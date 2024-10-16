@@ -44,6 +44,8 @@ RUN pip install nodriver --break-system-packages
 RUN chmod o+rX -R ./assets ./config ./locales
 RUN chown -R invidious:invidious /invidious
 
+RUN sed -i 's/await self.sleep(0.5)/await self.sleep(20)/' /usr/lib/python3.12/site-packages/nodriver/core/browser.py
+
 EXPOSE 3000
 USER invidious
 
