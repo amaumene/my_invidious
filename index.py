@@ -22,6 +22,7 @@ async def main():
     tab = browser.main_tab
     tab.add_handler(cdp.network.RequestWillBeSent, send_handler)
     page = await browser.get('https://www.youtube.com/embed/kgh-WIxeZX4')
+    page = browser.get('https://www.youtube.com/embed/kgh-WIxeZX4')
     await tab.wait(cdp.network.RequestWillBeSent)
     print("[INFO] waiting 10 seconds for the page to fully load.")
     await tab.sleep(10)

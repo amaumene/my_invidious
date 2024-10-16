@@ -1,4 +1,4 @@
-FROM alpine:latest AS builder
+FROM alpine:3.19 AS builder
 
 RUN apk add --update --no-cache \
     crystal shards sqlite-static yaml-static yaml-dev libxml2-static zlib-static openssl-libs-static openssl-dev musl-dev xz-static \
@@ -16,7 +16,7 @@ RUN crystal build ./src/invidious.cr \
         --static --warnings all \
         --link-flags "-lxml2 -llzma"
 
-FROM alpine:latest
+FROM alpine:3.19
 RUN apk add --update --no-cache \
       xvfb \
       chromium \
