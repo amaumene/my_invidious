@@ -1,50 +1,36 @@
-FROM alpine:3.19 AS builder
+FROM registry.access.redhat.com/ubi9 AS builder
 
-RUN apk add --update --no-cache \
-    crystal shards sqlite-static yaml-static yaml-dev libxml2-static zlib-static openssl-libs-static openssl-dev musl-dev xz-static \
-    git
+RUN curl -s https://packagecloud.io/install/repositories/84codes/crystal/script.rpm.sh | bash
 
-ENV repo https://github.com/iv-org/invidious.git
+RUN dnf install crystal-1.12.2-139 git sqlite-devel openssl-devel libxml2-devel libyaml-devel zlib-devel glibc-devel libevent-devel pcre-devel -y
 
-WORKDIR /invidious
-RUN git clone ${repo} /invidious
-RUN git checkout v2.20240825.2
+WORKDIR /app
+
+RUN git clone https://github.com/iv-org/invidious.git
+
+WORKDIR /app/invidious
+
+RUN git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+
 RUN shards install --production
+RUN crystal build ./src/invidious.cr --release
+#RUN crystal build ./src/invidious.cr --release --static --warnings all --link-flags "-lxml2 -llzma"
+RUN ls -lah
 
-RUN crystal build ./src/invidious.cr \
-        --release \
-        --static --warnings all \
-        --link-flags "-lxml2 -llzma"
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
-FROM alpine:3.19
-RUN apk add --update --no-cache \
-      xvfb \
-      chromium \
-      rsvg-convert ttf-opensans \
-      py3-pip
+WORKDIR /app
 
-COPY ./startup.sh ./
-RUN chmod +x /startup.sh
+COPY --from=builder /app/invidious/invidious /app/
 
-WORKDIR /invidious
-RUN addgroup -g 1000 -S invidious && \
-    adduser -u 1000 -S invidious -G invidious
+COPY --from=builder /app/invidious/config/config.example.yml /app/config/config.yml
+RUN sed -i 's/host: \(127.0.0.1\|localhost\)/host: invidious-db/' /app/config/config.yml
+COPY --from=builder /app/invidious/config/sql/ /app/config/sql/
+COPY --from=builder /app/invidious/locales/ /app/locales/
+COPY --from=builder /app/invidious/assets /app/assets/
 
-COPY --from=builder /invidious/config/config.example.yml ./config/config.yml
+EXPOSE 3000/tcp
 
-COPY --from=builder /invidious/config/sql/ ./config/sql/
-COPY --from=builder /invidious/locales/ ./locales/
-COPY --from=builder /invidious/assets ./assets/
-COPY --from=builder /invidious/invidious .
+USER 1001
 
-COPY ./index.py .
-
-RUN pip install nodriver --break-system-packages
-
-RUN chmod o+rX -R ./assets ./config ./locales
-RUN chown -R invidious:invidious /invidious
-
-EXPOSE 3000
-USER invidious
-
-CMD [ "/startup.sh"]
+CMD [ "/app/invidious" ]
