@@ -1,4 +1,4 @@
-name: Docker
+name: Publish container
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -24,5 +24,5 @@ env:
 
 jobs:
   call-my-containers-publish:
-    uses: github.com/amaumene/my_containers/blob/main/.github/workflows/publish-container.yml@main
+    uses: amaumene/my_containers/blob/main/.github/workflows/publish-container.yml@main
     
