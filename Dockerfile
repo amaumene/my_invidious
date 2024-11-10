@@ -6,7 +6,7 @@ RUN dnf install crystal-1.12.2-139 git sqlite-devel openssl-devel libxml2-devel 
 
 WORKDIR /app
 
-RUN git clone https://github.com/catspeed-cc/invidious.git
+RUN git clone https://github.com/iv-org/invidious.git
 
 WORKDIR /app/invidious
 
