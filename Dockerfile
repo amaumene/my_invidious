@@ -25,6 +25,13 @@ COPY --from=builder /app/invidious/invidious /app/
 
 COPY --from=builder /app/invidious/config/config.example.yml /app/config/config.yml
 RUN sed -i 's/host: \(127.0.0.1\|localhost\)/host: invidious-db/' /app/config/config.yml
+
+RUN sed -e '/http_proxy:/ s/^#*/#/g' -i /app/config/config.yml
+RUN sed -e '/user:/ s/^#*/#/g' -i /app/config/config.yml
+RUN sed -e '/password:/ s/^#*/#/g' -i /app/config/config.yml
+RUN sed -e '/host:/ s/^#*/#/g' -i /app/config/config.yml
+RUN sed -e '/port:/ s/^#*/#/g' -i /app/config/config.yml
+
 COPY --from=builder /app/invidious/config/sql/ /app/config/sql/
 COPY --from=builder /app/invidious/locales/ /app/locales/
 COPY --from=builder /app/invidious/assets /app/assets/
