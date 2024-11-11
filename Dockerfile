@@ -10,7 +10,7 @@ RUN git clone https://github.com/iv-org/invidious.git
 
 WORKDIR /app/invidious
 
-#RUN git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+RUN git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
 
 RUN shards install --production
 RUN crystal build ./src/invidious.cr --release
