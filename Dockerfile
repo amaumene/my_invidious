@@ -28,4 +28,6 @@ COPY --from=builder /invidious/invidious .
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
+EXPOSE 3000/tcp
+
 CMD [ "/invidious/invidious" ]
