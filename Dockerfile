@@ -16,7 +16,6 @@ RUN crystal build ./src/invidious.cr \
     --static --warnings all \
     --link-flags "-lxml2 -llzma"
 
-#FROM gcr.io/distroless/base
 FROM scratch
 
 WORKDIR /invidious
@@ -28,6 +27,8 @@ COPY --from=builder /invidious/assets ./assets/
 COPY --from=builder /invidious/invidious .
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 EXPOSE 3000/tcp
 
