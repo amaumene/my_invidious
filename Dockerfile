@@ -16,7 +16,8 @@ RUN crystal build ./src/invidious.cr \
     --static --warnings all \
     --link-flags "-lxml2 -llzma"
 
-FROM gcr.io/distroless/base
+#FROM gcr.io/distroless/base
+FROM scratch
 
 WORKDIR /invidious
 
